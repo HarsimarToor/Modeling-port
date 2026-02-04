@@ -122,7 +122,7 @@ export default function Home() {
 
           </div>
           <div className={`md:col-span-4 aspect-[1/1.5] md:mt-5 overflow-hidden bg-gray-100 ${revealClass('delay-500')}`}>
-            <img src="IMG_9999.jpg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
+            <img src="IMG_3489.jpg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
           </div>
 
         </div>
