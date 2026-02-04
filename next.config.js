@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Remove the 'turbo' key from here if it's under 'experimental'
   experimental: {
-    turbo: false,
+    // other experimental features...
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
