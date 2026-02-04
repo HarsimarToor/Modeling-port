@@ -171,6 +171,7 @@ export default function Home() {
               href={
                 item === 'Home' ? '/' :
                   item === 'Experience' ? '/exp' :
+                    item === 'Contact' ? '/contact' :
                     `/${item.toLowerCase()}`
               }
               onClick={() => setMenuOpen(false)}
