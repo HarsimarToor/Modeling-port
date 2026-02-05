@@ -1,79 +1,106 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Menu, X, Eye, ArrowRight } from 'lucide-react'
+import { ArrowRight, X } from 'lucide-react'
+
+// Intersection Observer Hook for the "Scroll to Color" effect
+function useElementOnScreen(options) {
+  const containerRef = useRef(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsVisible(entry.isIntersecting)
+    }, options)
+    if (containerRef.current) observer.observe(containerRef.current)
+    return () => {
+      if (containerRef.current) observer.unobserve(containerRef.current)
+    }
+  }, [containerRef, options])
+
+  return [containerRef, isVisible]
+}
+
+// Reusable Image Component with Reveal Effect
+const PortfolioImage = ({ src, alt, className = "", delay = "0" }) => {
+  const [ref, isVisible] = useElementOnScreen({ threshold: 0.4 })
+  return (
+    <div
+      ref={ref}
+      className={`relative overflow-hidden bg-neutral-100 transition-all duration-[1.5s] ease-out ${className} 
+      ${isVisible ? 'grayscale-0 scale-[1.02]' : 'grayscale scale-100'}`}
+    >
+      <img src={src} alt={alt} className="w-full h-full object-cover" />
+    </div>
+  )
+}
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false) // For initial page load trigger
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    setIsLoaded(true) // Triggers the entrance animation
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
+    setIsLoaded(true)
+    const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const stats = [
-    { label: 'HEIGHT', value: "6'3\" / 190.5 cm" },
+    { label: 'HEIGHT', value: "6'3\" / 190 cm" },
+    { label: 'CHEST / WAIST', value: '38" / 30"' }, // Added 6th stat for symmetry
     { label: 'HAIR', value: 'Black' },
     { label: 'EYES', value: 'Dark Brown' },
-    { label: 'LOCATION', value: 'Philippines, Davao City' },
-    { label: 'TRAVEL', value: 'Weekends' }
+    { label: 'LOCATION', value: 'Davao, PH' },
+    { label: 'TRAVEL', value: 'Worldwide' }
   ]
-
-  // Shared animation classes
-  const revealClass = (delay = "0") =>
-    `transition-all duration-1000 ease-out transform ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-    } ${delay}`
+  const partners = [
+    { name: 'GCash', role: 'Ambassador', year: '2025' },
+    { name: 'Lacoste', role: 'Fashion', year: '2026' },
+    { name: 'Champion', role: 'Editorial', year: '2026' },
+    { name: 'Kadayawan', role: 'Runway', year: '2025' },
+  ]
 
   return (
     <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white overflow-x-hidden">
+
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ${scrolled ? 'bg-white/80 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-8'
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${scrolled ? 'bg-white/70 backdrop-blur-lg py-3 shadow-sm' : 'bg-transparent py-6'
         }`}>
-        <div className="max-w-screen-2xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="text-xl font-medium tracking-[0.3em] font-serif transition-opacity hover:opacity-50">
+        <div className="max-w-screen-xl mx-auto px-6 flex items-center justify-between">
+          <Link href="/" className="text-lg font-medium tracking-[0.4em] font-serif uppercase">
             SIMAR
           </Link>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="relative z-50 p-2 group"
-          >
-            <div className="space-y-1.5">
-              <span className={`block h-0.5 w-6 bg-current transition-transform duration-500 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-              <span className={`block h-0.5 w-6 bg-current transition-opacity duration-500 ${menuOpen ? 'opacity-0' : ''}`}></span>
-              <span className={`block h-0.5 w-6 bg-current transition-transform duration-500 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
-            </div>
+          <button onClick={() => setMenuOpen(true)} className="flex flex-col gap-1.5 p-2 group">
+            <span className="block h-[1px] w-6 bg-current"></span>
+            <span className="block h-[1px] w-4 bg-current ml-auto transition-all group-hover:w-6"></span>
           </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative h-[90vh] md:h-screen w-full bg-neutral-100 overflow-hidden">
+      <section className="relative h-[85vh] md:h-screen w-full overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="IMG_5512.jpeg"
             alt="Harsimar Singh Toor"
-            className={`w-full h-full object-cover grayscale brightness-[0.9] object-top md:object-center transition-all duration-[2.5s] ease-out ${isLoaded ? 'scale-100 blur-0' : 'scale-110 blur-sm'
+            className={`w-full h-full object-cover object-top md:object-center transition-all duration-[3s] ${isLoaded ? 'scale-100' : 'scale-110'
               }`}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
         </div>
 
-        <div className="absolute bottom-12 left-0 w-full px-6">
-          <div className="max-w-screen-2xl mx-auto">
-            <h1 className={`text-5xl md:text-[4vw] font-light leading-[0.9] tracking-tighter text-white font-serif mb-6 ${revealClass('delay-300')}`}>
-              HARSIMAR <br className="md:hidden" /> SINGH TOOR
+        <div className="absolute bottom-10 left-0 w-full px-6">
+          <div className="max-w-screen-xl mx-auto">
+            <h1 className={`text-4xl md:text-[5vw] font-serif text-white leading-none mb-4 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+              HARSIMAR <br /> SINGH TOOR
             </h1>
-            <div className={`flex flex-wrap items-center gap-4 text-xs md:text-sm tracking-[0.2em] text-gray-200 uppercase ${revealClass('delay-500')}`}>
+            <div className={`flex items-center gap-3 text-[12px] tracking-[0.2em] text-neutral-300 uppercase ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
               <span>Pure Indian</span>
               <span className="w-1 h-1 bg-white rounded-full"></span>
-              <span>19 Years Old</span>
+              <span>19 Years</span>
               <span className="w-1 h-1 bg-white rounded-full"></span>
               <span>Model</span>
             </div>
@@ -81,109 +108,144 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Reveal */}
-      <section className="border-y border-gray-100 bg-white">
-        <div className="max-w-screen-2xl mx-auto">
-          <div className={`flex overflow-x-auto no-scrollbar py-10 px-6 divide-x divide-gray-100 ${revealClass('delay-700')}`}>
+      {/* Stats Section - Balanced 6-item Grid */}
+      <section className="bg-white py-12 border-b border-neutral-100">
+        <div className="max-w-screen-xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-10 gap-x-4">
             {stats.map((stat, i) => (
-              <div key={i} className="flex-none px-8 first:pl-0 last:pr-0 min-w-[160px] group">
-                <p className="text-[10px] tracking-[0.3em] text-gray-400 mb-2 uppercase group-hover:text-black transition-colors">{stat.label}</p>
-                <p className="text-lg font-light tracking-tight">{stat.value}</p>
+              <div key={i} className="group flex flex-col items-center md:items-start text-center md:text-left">
+                <p className="text-[9px] tracking-[0.3em] text-neutral-400 mb-2 uppercase font-medium">
+                  {stat.label}
+                </p>
+                <p className="text-base font-light text-neutral-900 tracking-tight">
+                  {stat.value}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Portfolio Reveal */}
-      <section className="max-w-screen-2xl mx-auto px-6 py-24 md:py-40">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 overflow-hidden">
-          <h2 className={`text-4xl md:text-7xl font-serif font-light leading-none transition-all duration-1000 delay-200 ${isLoaded ? 'translate-y-0' : 'translate-y-full'}`}>
-            Selected <br />Portfolio
-          </h2>-
-          <Link href="/exp" className="group flex items-center gap-2 text-sm tracking-widest uppercase border-b border-black pb-1">
-            View All Projects <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+      {/* Portfolio Section - Refined for Laptop Aspect Ratios */}
+      <section className="max-w-screen-xl mx-auto px-6 py-20 md:py-32">
+        <div className="flex justify-between items-end mb-12">
+          <h2 className="text-3xl md:text-6xl font-serif leading-none">Selected<br />Works</h2>
+          <Link href="/exp" className="group flex items-center gap-2 text-[10px] tracking-widest uppercase border-b border-black pb-1">
+            Explore <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10">
-          <div className={`md:col-span-8 aspect-[4/5] overflow-hidden bg-gray-100 ${revealClass('delay-300')}`}>
-            <img src="IMG_5785.jpeg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
-          </div>
-          <div className={`md:col-span-4 aspect-[3/4] md:mt-24 overflow-hidden bg-gray-100 ${revealClass('delay-500')}`}>
-            <img src="IMG_5725.jpeg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
-          </div>
-          <div className={`md:col-span-4 aspect-[1/1.5] md:mt-5 overflow-hidden bg-gray-100 ${revealClass('delay-500')}`}>
-            <img src="IMG_3491 (1).jpg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
+        {/* Changed items-start to prevent vertical stretching on laptops */}
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-4 md:gap-8 items-start">
 
-          </div>
-          <div className={`md:col-span-4 aspect-[1/1.5] md:mt-5 overflow-hidden bg-gray-100 ${revealClass('delay-500')}`}>
-            <img src="IMG_3490.jpg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
+          {/* Large Lead Image: Optimized ratio for laptop to prevent cropping */}
+          <PortfolioImage
+            src="IMG_5785.jpeg"
+            alt="Editorial"
+            className="col-span-2 md:col-span-8 aspect-[4/5] md:aspect-[9/11]"
+          />
 
-          </div>
-          <div className={`md:col-span-4 aspect-[1/1.5] md:mt-5 overflow-hidden bg-gray-100 ${revealClass('delay-500')}`}>
-            <img src="IMG_3489.jpg" alt="Editorial" className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000 grayscale hover:grayscale-0" />
-          </div>
+          {/* Side Image: Taller portrait for laptop */}
+          <PortfolioImage
+            src="IMG_5725.jpeg"
+            alt="Editorial"
+            className="col-span-2 md:col-span-4 aspect-[3/4] md:aspect-[4/6]"
+          />
 
+          {/* Bottom Row: Asymmetric staggered heights */}
+          <PortfolioImage
+            src="IMG_3491 (1).jpg"
+            alt="Editorial"
+            className="col-span-1 md:col-span-4 aspect-[2/3]"
+          />
+
+          <PortfolioImage
+            src="IMG_3490.jpg"
+            alt="Editorial"
+            className="col-span-1 md:col-span-4 aspect-[2/3] md:mt-24"
+          />
+
+          <PortfolioImage
+            src="IMG_3489.jpg"
+            alt="Editorial"
+            className="col-span-2 md:col-span-4 aspect-[4/5] md:aspect-square"
+          />
         </div>
       </section>
 
-      {/* Brand Partners Reveal */}
-      <section className="bg-black text-white py-50 md:py-20">
-        <div className="max-w-screen-2xl mx-auto px-6">
-          <p className="text-center text-base tracking-[0.5em] text-gray-500 mb-12 uppercase">Industry Partnerships</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-px md:bg-white/10">
-            {['GCash', 'Lacoste', 'Kadayawan'].map((brand, i) => (
-              <div key={brand} className={`bg-black py-10 md:p-12 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'} delay-[${i * 200}ms]`}>
-                <h3 className="text-sm tracking-widest text-gray-500 mb-6 uppercase">
-                  {i === 0 ? 'Key Brand' : i === 1 ? 'Fashion' : 'Runway'}
-                </h3>
-                <p className="text-5xl font-serif mb-2">{brand}</p>
-                <p className="text-gray-400 font-light">{i === 0 ? 'Brand Ambassador · 2025' : i === 1 ? 'Editorial Campaign' : 'Featured Model'}</p>
+      {/* Industry Partnerships - Compact for Mobile */}
+      <section className="bg-neutral-950 text-white py-20">
+        <div className="max-w-screen-xl mx-auto px-6">
+          <p className="text-[10px] tracking-[0.5em] text-neutral-500 mb-12 uppercase text-center md:text-left">Industry Partnerships</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-12">
+            {partners.map((brand) => (
+              <div key={brand.name} className="flex flex-col">
+                <span className="text-[9px] text-neutral-500 tracking-tighter mb-2 italic">{brand.year}</span>
+                <h3 className="text-2xl md:text-3xl font-serif mb-1">{brand.name}</h3>
+                <p className="text-[10px] text-neutral-400 uppercase tracking-widest">{brand.role}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-20 px-6 border-t border-gray-100">
-        <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-[13px] tracking-[0.3em] text-gray-400 uppercase">© 2026 Harsimar Singh Toor</p>
-          <div className="flex gap-8">
-            <a href="#" className="text-[14px] tracking-[0.3em] hover:text-black transition-colors">INSTAGRAM</a>
-            <a href="#" className="text-[14px] tracking-[0.3em] hover:text-black transition-colors">BOOKING</a>
+      {/* Footer - Optimized Height */}
+      <footer className="py-12 px-6 bg-white border-t border-neutral-100">
+        <div className="max-w-screen-xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          {/* Copyright */}
+          <p className="text-[10px] tracking-[0.2em] text-neutral-400 uppercase">
+            © 2026 Harsimar Singh Toor
+          </p>
+
+          {/* Social Links */}
+          <div className="flex gap-10">
+            <a
+              href="https://instagram.com/cmrtoor/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] tracking-[0.3em] uppercase hover:opacity-50 transition-opacity"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://www.facebook.com/harsimar.singh.395454/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] tracking-[0.3em] uppercase hover:opacity-50 transition-opacity"
+            >
+              Facebook
+            </a>
           </div>
         </div>
       </footer>
 
       {/* Navigation Overlay */}
       {/* Navigation Overlay */}
-      <div className={`fixed inset-0 bg-white z-[60] transition-transform duration-1000 ease-[cubic-bezier(0.85,0,0.15,1)] ${menuOpen ? 'translate-y-0' : 'translate-y-full'}`}>
-        <button onClick={() => setMenuOpen(false)} className="absolute top-8 right-6 p-2 group transition-transform hover:rotate-90">
-          <X size={32} />
+      <div className={`fixed inset-0 bg-white z-[100] transition-all duration-700 ease-[cubic-bezier(0.8,0,0.2,1)] ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <button onClick={() => setMenuOpen(false)} className="absolute top-8 right-6 p-2">
+          <X size={30} strokeWidth={1} />
         </button>
-        <div className="h-full flex flex-col justify-center px-12 space-y-8">
-          {['Home', 'Experience', 'Contact'].map((item, i) => (
+
+        <div className="h-full flex flex-col justify-center px-10 space-y-6">
+          {[
+            { name: 'Home', path: '/' },
+            { name: 'Experience', path: '/exp' },
+            { name: 'Contact', path: '/contact' } // Points exactly to your contact page
+          ].map((item, i) => (
             <Link
-              key={item}
-              /* Logic: Home -> /, Experience -> /exp, Contact -> /contact */
-              href={
-                item === 'Home' ? '/' :
-                  item === 'Experience' ? '/exp' :
-                    item === 'Contact' ? '/contact' :
-                    `/${item.toLowerCase()}`
-              }
+              key={item.name}
+              href={item.path}
               onClick={() => setMenuOpen(false)}
-              className={`text-6xl md:text-8xl font-serif font-light hover:italic transition-all inline-block hover:pl-8 duration-500 ${menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
+              className={`text-5xl md:text-8xl font-serif font-light hover:italic transition-all duration-500 block ${menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                 }`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              {item}
+              {item.name}
             </Link>
           ))}
         </div>
       </div>
+
     </div>
   )
 }

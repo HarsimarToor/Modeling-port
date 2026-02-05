@@ -1,12 +1,73 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Calendar, Users, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ArrowLeft, ChevronLeft, ChevronRight, X } from 'lucide-react'
+
+function useElementOnScreen(options) {
+    const containerRef = useRef(null)
+    const [isVisible, setIsVisible] = useState(false)
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsVisible(entry.isIntersecting)
+        }, options)
+        if (containerRef.current) observer.observe(containerRef.current)
+        return () => {
+            if (containerRef.current) observer.unobserve(containerRef.current)
+        }
+    }, [containerRef, options])
+
+    return [containerRef, isVisible]
+}
+
+const ExperienceCard = ({ project, onClick }) => {
+    const [ref, isVisible] = useElementOnScreen({ threshold: 0.3 })
+    const isVideo = project.image.endsWith('.mp4')
+
+    return (
+        <div
+            ref={ref}
+            onClick={() => onClick(project)}
+            className="group cursor-pointer transition-transform duration-700"
+        >
+            <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100 mb-6">
+                {isVideo ? (
+                    <video
+                        src={project.image}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className={`w-full h-full object-cover transition-all duration-[1.5s] ease-out ${isVisible ? 'grayscale-0 scale-[1.03]' : 'grayscale scale-100'
+                            }`}
+                    />
+                ) : (
+                    <img
+                        src={project.image}
+                        alt={project.client}
+                        className={`w-full h-full object-cover transition-all duration-[1.5s] ease-out ${isVisible ? 'grayscale-0 scale-[1.03]' : 'grayscale scale-100'
+                            }`}
+                    />
+                )}
+                <div className="absolute bottom-4 right-4 bg-white px-3 py-1 text-[9px] tracking-[0.2em] uppercase shadow-sm z-10">
+                    View Details
+                </div>
+            </div>
+            <div className={`space-y-1 transition-all duration-1000 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                <h3 className="text-2xl font-serif">{project.client}</h3>
+                <div className="flex justify-between items-center text-[10px] tracking-[0.2em] text-neutral-400 uppercase">
+                    <span>{project.type}</span>
+                    <span>{project.date.split(',')[1] || project.date}</span>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export default function Experience() {
     const [selectedProject, setSelectedProject] = useState(null)
-    const [currentImageIndex, setCurrentImageIndex] = useState(0) // Fixed: Added missing state
+    const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
     const projects = [
         {
@@ -14,28 +75,21 @@ export default function Experience() {
             type: 'Fashion Show',
             client: 'Lacoste & Champion',
             date: 'January 24, 2026',
-            location: 'Abrezza Malls, Davao',
-            description: 'Runway show featuring latest collections from Lacoste and Champion',
-            image: 'https://images.unsplash.com/photo-1556807215-f47c31a66ac2?q=85',
-            gallery: [
-                'https://images.unsplash.com/photo-1556807215-f47c31a66ac2?q=85',
-                'https://images.unsplash.com/photo-1594245703266-cbcf061378c3?q=85',
-                'https://images.unsplash.com/photo-1651014400775-a38cc66f95e7?q=85'
-            ],
+            location: 'Abreeza Mall, Davao',
+            description: 'Runway show featuring the Spring/Summer 2026 collections.',
+            image: 'lac1.jpeg',
+            gallery: ['lac1.jpeg', 'lac2.jpeg', 'champ1.jpeg', 'champ2.jpeg'],
             team: { photographer: 'TBA', stylist: 'Brand Creative Team' }
         },
         {
-
             id: 2,
             type: 'Club Photoshoot',
             client: 'XCLV Davao',
             date: 'January 15, 2026',
             location: 'XCLV, Davao City',
-            description: 'High-end club promotional photoshoot featuring editorial and lifestyle photography',
-            image: 'https://images.unsplash.com/photo-1559907252-60b1e6e600da?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHw0fHxmYXNoaW9uJTIwZWRpdG9yaWFsJTIwbWFsZSUyMG1vZGVsfGVufDB8fHxibGFja19hbmRfd2hpdGV8MTc3MDA5NzgxOHww&ixlib=rb-4.1.0&q=85',
-            gallery: [
-                "", "", ""
-            ],
+            description: 'High-end club promotional photoshoot featuring editorial and lifestyle photography.',
+            image: '/simar.mp4', // Your video file here
+            gallery: ['xcl1.jpeg', 'xcl2.jpeg'],
             team: { photographer: 'XCLV Creative Team', stylist: 'TBA' }
         },
         {
@@ -43,47 +97,40 @@ export default function Experience() {
             type: 'Brand Ambassador',
             client: 'GCash',
             date: 'August 15-17, 2025',
-            location: 'Abrezza Malls, Davao',
-            duration: '3-Day Event',
-            description: 'Brand ambassador for GCash during a major 3-day promotional event at Abrezza Malls',
-            image: 'https://images.unsplash.com/photo-1589081318939-f9952734290f?q=85',
-            gallery: [
-                'https://images.unsplash.com/photo-1589081318939-f9952734290f?q=85',
-                'https://images.unsplash.com/photo-1556807215-f47c31a66ac2?q=85',
-                'https://images.unsplash.com/photo-1559907252-60b1e6e600da?q=85'
-            ],
-            team: { photographer: 'TBA', stylist: 'GCash Creative Team' }
+            location: 'Abreeza Mall, Davao',
+            description: 'Lead brand ambassador for a 3-day regional promotional event.',
+            image: 'gcash1.JPG',
+            gallery: ['gcash1.JPG', 'gcash2.JPG', 'gcash3.JPG', 'gcash4.JPG', 'gcash5.JPG', 'gcash6.JPG'],
+            team: { photographer: 'Agency Team', stylist: 'GCash Creative' }
         },
-
-      
-
-
         {
-
             id: 4,
             type: 'Restaurant Campaign',
-            client: 'Marinara Ristorante Bistro and Pub',
+            client: 'Marinara Ristorante',
             date: 'July 2025',
             location: 'Davao City',
-            description: 'Restaurant promotional campaign featuring lifestyle and dining photography',
-            image: 'https://images.unsplash.com/photo-1594245703266-cbcf061378c3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBtYWxlJTIwbW9kZWx8ZW58MHx8fGJsYWNrX2FuZF93aGl0ZXwxNzcwMDk3ODIzfDA&ixlib=rb-4.1.0&q=85',
-            gallery: [
-                "", "", ""
-            ],
-            team: {
-                photographer: 'Restaurant Creative Team', stylist: 'TBA'
-            }
-
+            description: 'Lifestyle campaign for social media and digital menus.',
+            image: 'mari1.JPG',
+            gallery: ['mari1.JPG'],
+            team: { photographer: 'Marinara Creative', stylist: 'TBA' }
         },
         {
-
             id: 5,
-            type: ""
-        }
-
-
-
-        // Add more projects here following the same gallery structure
+            type: 'Runway Collective',
+            client: 'Runway Archive',
+            date: '2025 - 2026',
+            location: 'Various Locations',
+            description: 'A comprehensive collection of runway appearances, including Kadayawan Fashion Week, local designer showcases, and retail launches across the region.',
+            image: 'RUN4.JPG', // This will be the cover image
+            gallery: [
+                'RUN1.JPG',
+                'RUN2.JPG',
+                'RUN3.JPG',
+                'RUN4.JPG',
+                'RUN5.JPG'
+            ], // Add all your past runway filenames here
+            team: { photographer: 'Various', stylist: 'On-site Creative Teams' }
+        },
     ]
 
     const nextImage = (e) => {
@@ -99,130 +146,78 @@ export default function Experience() {
     const openProject = (project) => {
         setSelectedProject(project)
         setCurrentImageIndex(0)
+        document.body.style.overflow = 'hidden'
+    }
+
+    const closeProject = () => {
+        setSelectedProject(null)
+        document.body.style.overflow = 'unset'
     }
 
     return (
-        <div className="min-h-screen bg-white text-black">
-            {/* Header */}
-            <header className="border-b border-gray-100 sticky top-0 bg-white/80 backdrop-blur-md z-30">
-                <div className="max-w-screen-2xl mx-auto px-6 lg:px-12 py-6">
-                    <Link href="/" className="inline-flex items-center gap-3 text-sm tracking-[0.2em] uppercase hover:opacity-50 transition-all group">
-                        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                        <span>Archive</span>
+        <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
+            <header className="fixed top-0 left-0 right-0 border-b border-gray-50 bg-white/80 backdrop-blur-lg z-40">
+                <div className="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <Link href="/" className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase group">
+                        <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                        <span>Back</span>
                     </Link>
+                    <span className="text-[10px] tracking-[0.3em] uppercase text-gray-400">Archive 2025-2026</span>
                 </div>
             </header>
 
-            {/* Hero */}
-            <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 py-20">
-                <h1 className="text-6xl md:text-9xl font-light tracking-tighter mb-6 font-serif">
-                    Experience <span className="bold text-gray-5s00">Log</span>
+            <section className="max-w-screen-xl mx-auto px-6 pt-32 pb-16 md:pt-48 md:pb-24">
+                <h1 className="text-5xl md:text-8xl font-serif font-light tracking-tighter mb-6 leading-none">
+                    Experience <span className="italic text-neutral-300">Log</span>
                 </h1>
-                <p className='text-xl text-gray-500 tracking-wide max-w-2xl editorial-fade-in-delay-1'> My most recent
-                    Shows and Collaborations.
+                <p className="text-sm md:text-lg text-neutral-500 max-w-lg leading-relaxed uppercase tracking-wider font-light">
+                    A curated selection of runway shows, brand campaigns, and editorial collaborations.
                 </p>
             </section>
 
-            {/* Projects Grid */}
-            <section className="max-w-screen-2xl mx-auto px-6 lg:px-12 pb-32">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <section className="max-w-screen-xl mx-auto px-6 pb-32">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 gap-x-12">
                     {projects.map((project) => (
-                        <div
-                            key={project.id}
-                            onClick={() => openProject(project)}
-                            className="group cursor-pointer space-y-6"
-                        >
-                            <div className="relative aspect-[4/5] overflow-hidden bg-gray-50 border border-gray-100">
-                                <img
-                                    src={project.image}
-                                    alt={project.client}
-                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-                                />
-                                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] tracking-[0.2em] uppercase">
-                                    View Case
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="text-3xl font-serif">{project.client}</h3>
-                                    <p className="text-gray-400 text-xs tracking-widest uppercase mt-2">{project.type}</p>
-                                </div>
-                            </div>
-                        </div>
+                        <ExperienceCard key={project.id} project={project} onClick={openProject} />
                     ))}
                 </div>
             </section>
 
-            {/* Swipeable Modal */}
             {selectedProject && (
-                <div
-                    className="fixed inset-0 bg-white z-50 flex flex-col md:flex-row overflow-hidden"
-                    onClick={() => setSelectedProject(null)}
-                >
-                    {/* Slider Section */}
-                    <div className="relative h-[60vh] md:h-full md:flex-1 bg-neutral-900 flex items-center justify-center">
-                        {/* Nav Buttons - Made large for thumb-tapping */}
-                        <button
-                            onClick={prevImage}
-                            className="absolute left-4 z-10 p-4 text-white/50 hover:text-white transition-colors"
-                        >
-                            <ChevronLeft size={40} strokeWidth={1} />
-                        </button>
-                        <button
-                            onClick={nextImage}
-                            className="absolute right-4 z-10 p-4 text-white/50 hover:text-white transition-colors"
-                        >
-                            <ChevronRight size={40} strokeWidth={1} />
-                        </button>
+                <div className="fixed inset-0 bg-white z-[60] flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
+                    <button onClick={closeProject} className="fixed top-6 right-6 z-[70] bg-black text-white p-3 rounded-full md:bg-transparent md:text-black">
+                        <X size={24} />
+                    </button>
 
-                        <img
-                            src={selectedProject.gallery[currentImageIndex]}
-                            className="w-full h-full object-contain animate-in fade-in duration-500"
-                            alt="Gallery"
-                            key={currentImageIndex}
-                        />
-
-                        {/* Counter Label */}
-                        <div className="absolute bottom-6 left-6 text-white/40 text-[10px] tracking-[0.3em] uppercase">
-                            {currentImageIndex + 1} / {selectedProject.gallery.length}
-                        </div>
-
-                        <button
-                            onClick={() => setSelectedProject(null)}
-                            className="absolute top-6 right-6 text-white p-2"
-                        >
-                            <X size={24} />
-                        </button>
+                    <div className="relative h-[60vh] md:h-full md:flex-1 bg-neutral-950 flex items-center justify-center">
+                        {selectedProject.gallery.length > 1 && (
+                            <>
+                                <button onClick={prevImage} className="absolute left-4 p-4 text-white/30 hover:text-white z-10">
+                                    <ChevronLeft size={32} />
+                                </button>
+                                <button onClick={nextImage} className="absolute right-4 p-4 text-white/30 hover:text-white z-10">
+                                    <ChevronRight size={32} />
+                                </button>
+                            </>
+                        )}
+                        <img src={selectedProject.gallery[currentImageIndex]} className="w-full h-full object-contain p-4" alt="Gallery" />
                     </div>
 
-                    {/* Details Section */}
-                    <div
-                        className="h-[40vh] md:h-full md:w-[450px] bg-white p-8 md:p-12 overflow-y-auto border-l border-gray-100"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                    <div className="md:w-[450px] bg-white p-8 md:p-16 flex flex-col justify-center">
                         <div className="space-y-8">
                             <div>
-                                <p className="text-[10px] tracking-[0.3em] text-gray-400 uppercase mb-2">{selectedProject.type}</p>
+                                <p className="text-[10px] tracking-[0.3em] text-neutral-400 uppercase mb-2">{selectedProject.type}</p>
                                 <h2 className="text-4xl font-serif mb-4">{selectedProject.client}</h2>
-                                <p className="text-gray-500 text-sm leading-relaxed">{selectedProject.description}</p>
+                                <p className="text-neutral-600 text-sm leading-relaxed">{selectedProject.description}</p>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-8">
+                            <div className="grid grid-cols-2 gap-8 border-t border-neutral-100 pt-8">
                                 <div>
-                                    <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">Location</p>
-                                    <p className="text-sm">{selectedProject.location}</p>
+                                    <p className="text-[9px] text-neutral-400 uppercase mb-1">Location</p>
+                                    <p className="text-xs uppercase tracking-wider">{selectedProject.location}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-1">Date</p>
-                                    <p className="text-sm">{selectedProject.date}</p>
-                                </div>
-                            </div>
-
-                            <div className="pt-8 border-t border-gray-100">
-                                <p className="text-[10px] text-gray-400 tracking-widest uppercase mb-4">Creative Team</p>
-                                <div className="space-y-2 text-sm text-gray-600">
-                                    <p><span className="text-gray-300 mr-2">PH:</span> {selectedProject.team.photographer}</p>
-                                    <p><span className="text-gray-300 mr-2">ST:</span> {selectedProject.team.stylist}</p>
+                                    <p className="text-[9px] text-neutral-400 uppercase mb-1">Date</p>
+                                    <p className="text-xs uppercase tracking-wider">{selectedProject.date}</p>
                                 </div>
                             </div>
                         </div>
