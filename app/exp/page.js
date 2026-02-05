@@ -121,13 +121,13 @@ export default function Experience() {
             date: '2025 - 2026',
             location: 'Various Locations',
             description: 'A comprehensive collection of runway appearances, including Kadayawan Fashion Week, local designer showcases, and retail launches across the region.',
-            image: 'RUN4.JPG', // This will be the cover image
+            image: 'RUN4.jpg', // This will be the cover image
             gallery: [
                 'RUN1.JPG',
                 'RUN2.JPG',
-                'RUN3.JPG',
-                'RUN4.JPG',
-                'RUN5.JPG'
+                'RUN3.jpg',
+                'RUN4.jpg',
+                'RUN5.jpg'
             ], // Add all your past runway filenames here
             team: { photographer: 'Various', stylist: 'On-site Creative Teams' }
         },
