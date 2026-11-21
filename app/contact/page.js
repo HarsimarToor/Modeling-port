@@ -1,82 +1,78 @@
-'use client'
+import { Instagram, Facebook, Phone, Mail, MessageCircle } from 'lucide-react'
+import SiteHeader from '../../components/SiteHeader'
+import Reveal from '../../components/Reveal'
+import Footer from '../../components/Footer'
+import { contact } from '../../data/portfolio'
 
-import Link from 'next/link'
-import { ArrowLeft, Instagram, Facebook, Phone, Mail } from 'lucide-react'
+export const metadata = {
+  title: 'Contact - Harsimar Singh Toor',
+  description: 'Booking inquiries for runway, editorial and commercial projects.',
+}
+
+// Rows only appear when the link exists in data/portfolio.js
+function getLinks() {
+  const digits = (s) => s.replace(/[^\d]/g, '')
+  return [
+    contact.whatsapp && { name: 'WhatsApp', action: 'Message', Icon: MessageCircle, href: `https://wa.me/${digits(contact.whatsapp)}`, external: true },
+    contact.email && { name: 'Email', action: 'Write', Icon: Mail, href: `mailto:${contact.email}` },
+    contact.phone && { name: 'Call', action: 'Call', Icon: Phone, href: `tel:${contact.phone.replace(/[^\d+]/g, '')}` },
+    contact.instagram && { name: 'Instagram', action: 'Follow', Icon: Instagram, href: contact.instagram, external: true },
+    contact.facebook && { name: 'Facebook', action: 'Connect', Icon: Facebook, href: contact.facebook, external: true },
+  ].filter(Boolean)
+}
 
 export default function Contact() {
-     return (
-          <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
+  const links = getLinks()
 
-               {/* Navigation */}
-               <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg py-6">
-                    <div className="max-w-screen-xl mx-auto px-6 flex items-center justify-between">
-                         <Link href="/" className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase group">
-                              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                              <span>Back</span>
-                         </Link>
-                         <span className="text-[10px] tracking-[0.3em] uppercase text-neutral-400">Inquiries</span>
-                    </div>
-               </nav>
+  return (
+    <div className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
+      <SiteHeader />
 
-               <main className="max-w-screen-xl mx-auto px-6 pt-40 pb-20">
-                    <div className="max-w-4xl">
-                         {/* Heading */}
-                         <h1 className="text-6xl md:text-[8vw] font-serif font-light tracking-tighter leading-none mb-12">
-                              Let's <span className="italic text-neutral-300">Connect</span>
-                         </h1>
+      <main className="mx-auto max-w-screen-xl px-6 pb-20 pt-36 md:pt-40">
+        <div className="max-w-4xl">
+          <Reveal>
+            <h1 className="mb-8 font-serif text-6xl font-light leading-none tracking-tighter md:mb-12 md:text-[8vw]">
+              Let&apos;s <span className="italic text-neutral-300">Connect</span>
+            </h1>
+            <p className="mb-14 max-w-2xl text-sm font-light uppercase leading-relaxed tracking-[0.15em] text-neutral-500 md:mb-20 md:text-xl">
+              {contact.intro}
+            </p>
+          </Reveal>
 
-                         <p className="text-sm md:text-xl text-neutral-500 uppercase tracking-[0.15em] font-light mb-20 leading-relaxed max-w-2xl">
-                              Currently based in Davao City. Available for runway, editorial, and commercial projects worldwide.
-                         </p>
-
-                         {/* Contact Links */}
-                         <div className="space-y-12">
-
-                              {/* Instagram */}
-                              <a
-                                   href="https://www.instagram.com/cmrtoor/"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   className="group flex items-center justify-between border-b border-neutral-100 pb-8 hover:opacity-50 transition-all"
-                              >
-                                   <div className="flex items-center gap-6">
-                                        <Instagram size={24} strokeWidth={1} />
-                                        <span className="text-2xl md:text-4xl font-serif">Instagram</span>
-                                   </div>
-                                   <span className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 group-hover:translate-x-2 transition-transform">Follow</span>
-                              </a>
-
-                              {/* Facebook */}
-                              <a
-                                   href="https://www.facebook.com/harsimar.singh.395454/"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   className="group flex items-center justify-between border-b border-neutral-100 pb-8 hover:opacity-50 transition-all"
-                              >
-                                   <div className="flex items-center gap-6">
-                                        <Facebook size={24} strokeWidth={1} />
-                                        <span className="text-2xl md:text-4xl font-serif">Facebook</span>
-                                   </div>
-                                   <span className="text-[10px] tracking-[0.2em] uppercase text-neutral-400 group-hover:translate-x-2 transition-transform">Connect</span>
-                              </a>
-
-
-
-                         </div>
-                    </div>
-
-                    {/* Footer info */}
-                    <div className="mt-32 pt-12 border-t border-neutral-100 flex flex-col md:flex-row justify-between gap-8">
-                         <div>
-                              <p className="text-[10px] tracking-[0.3em] text-neutral-400 uppercase mb-2">Location</p>
-                              <p className="text-sm">Davao City, Philippines</p>
-                         </div>
-                         <div>
-                              <p className="text-[10px] tracking-[0.3em] text-neutral-400 uppercase mb-2">Availability</p>
-                              <p className="text-sm font-serif italic text-neutral-500">Currently accepting new bookings for 2026</p>
-                         </div>
-                    </div>
-               </main>
+          <div>
+            {links.map(({ name, action, Icon, href, external }, i) => (
+              <Reveal key={name} delay={i * 80}>
+                <a
+                  href={href}
+                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="group flex items-center justify-between gap-4 border-b border-neutral-100 py-7 transition-opacity active:opacity-50 md:py-9 md:hover:opacity-50"
+                >
+                  <div className="flex items-center gap-5 md:gap-6">
+                    <Icon size={24} strokeWidth={1} />
+                    <span className="font-serif text-3xl md:text-4xl">{name}</span>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 transition-transform group-hover:translate-x-2">
+                    {action}
+                  </span>
+                </a>
+              </Reveal>
+            ))}
           </div>
-     )
+        </div>
+
+        <div className="mt-20 flex flex-col justify-between gap-8 border-t border-neutral-100 pt-12 md:mt-32 md:flex-row">
+          <div>
+            <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-neutral-400">Location</p>
+            <p className="text-sm">{contact.location}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-[10px] uppercase tracking-[0.3em] text-neutral-400">Availability</p>
+            <p className="font-serif text-lg italic text-neutral-500">{contact.availability}</p>
+          </div>
+        </div>
+      </main>
+
+      <Footer cta={false} />
+    </div>
+  )
 }

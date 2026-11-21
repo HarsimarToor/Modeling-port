@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Harsimar Singh Toor — Modeling Portfolio
 
-## Getting Started
-
-First, run the development server:
+Next.js + Tailwind. Runs the same way as before:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Updating the site
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Everything you'd normally change lives in one file: `data/portfolio.js`.**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| I want to…                         | Do this                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------------- |
+| Add a photo to *Selected Works*    | Put the JPG in `public/images/`, add one line to `works` in the data file |
+| Add a new project (*Experience*)   | Put photos in `public/images/`, copy a block in `projects`, edit it     |
+| Change height / hair / eyes etc.   | Edit `stats`                                                            |
+| Change brand partnerships          | Edit `partners`                                                         |
+| Add email / phone / WhatsApp       | Fill in `contact` — a tap-to-contact row appears on the Contact page    |
+| Change "accepting bookings for…"   | Edit `contact.availability`                                             |
 
-## Learn More
+Tips
+- Photos: JPG, around 1500–2000px on the long side keeps pages fast on phones.
+  (Next.js also resizes them automatically for each device.)
+- Videos: `.mp4`, keep them short and compressed (720p is plenty).
+- In `works`, 9, 15 or 21 photos fill the grid with no gaps on phone and desktop.
+- The first photo in `works` is shown full-width on phones — put your best one there.
 
-To learn more about Next.js, take a look at the following resources:
+## Link previews
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+When the site is shared in iMessage/WhatsApp, the cover photo shows up as the preview.
+On Vercel this works automatically; on another host set `NEXT_PUBLIC_SITE_URL` to your domain.
